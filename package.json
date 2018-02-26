@@ -24,6 +24,14 @@
   },
   "homepage": "https://github.com/saildeep/queryoncsv#readme",
   "dependencies": {
+    "@types/async": "^2.0.47",
+    "@types/command-line-args": "^4.0.2",
+    "@types/csv-parse": "^1.1.11",
+    "@types/node": "^9.4.6",
+    "@types/sqlite3": "^3.1.1",
+    "async": "^2.6.0",
+    "command-line-args": "^5.0.2",
+    "csv-parse": "^2.0.4",
     "sqlite3": "^3.1.13",
     "typescript": "^2.7.2"
   }
