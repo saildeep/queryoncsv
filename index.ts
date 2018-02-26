@@ -17,8 +17,8 @@ const optionsDefinitions:commandLineArgs.OptionDefinition[]= [
     {name:'csvdelimiter',alias:'d',defaultValue:";",type:String,description:"Delimiter of the csv files"},
     {name:'outputdelimiter',alias:'D',defaultValue:';',type:String,description:"Delimiter of the output csv files"},
     {name:'noheader',alias:'H',defaultValue:false,type:Boolean,description:"Omit writing the header to the csv files"},
-    {name:'csvencoding',alias:'e',defaultValue:"latin1",type:String,description:"Encoding of the loaded csv files"},
-    {name:'queryencoding',defaultValue:"latin1",type:String,description:"Encoding of the queries"},
+    {name:'csvencoding',alias:'e',defaultValue:"utf-8",type:String,description:"Encoding of the loaded csv files"},
+    {name:'queryencoding',defaultValue:"utf-8",type:String,description:"Encoding of the queries"},
     {name:'help',alias:'h',defaultValue:false,type:Boolean,description:"Show this help text"}
 ];
 

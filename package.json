@@ -1,6 +1,6 @@
 {
   "name": "queryoncsv",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A small tool to execute sqlite3 queries on csv files",
   "main": "dist/index.js",
   "scripts": {
