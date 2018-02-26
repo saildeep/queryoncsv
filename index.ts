@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const csvgenerate: any = require('csv-write-stream');
-
+const cmdusage:any = require('command-line-usage');
 import * as commandLineArgs from 'command-line-args';
 import * as fs from 'fs';
 import * as sqlite3 from "sqlite3";
@@ -10,18 +10,34 @@ import * as csvparser from "csv-parse";
 const db = new sqlite3.Database(':memory:');
 
 const optionsDefinitions:commandLineArgs.OptionDefinition[]= [
-    {name:'verbose',alias:'v',type:Boolean},
-    {name:'csv',alias:'c',type:String,multiple:true},
-    {name:'queries',alias:'q',type:String,multiple:true},
-    {name:'outfiles',alias:'o',type:String,multiple:true},
-    {name:'csvdelimiter',alias:'d',defaultValue:";",type:String},
-    {name:'outputdelimiter',alias:'D',defaultValue:';',type:String},
-    {name:'outputnewline',alias:'N',defaultValue:'\n',type:String},
-    {name:'outputheader',alias:'H',defaultValue:true,type:String},
-    {name:'csvencoding',alias:'e',defaultValue:"latin1",type:String},
-    {name:'queryencoding',defaultValue:"latin1",type:String}
+    {name:'verbose',alias:'v',type:Boolean,description:"Verbose Logging"},
+    {name:'csv',alias:'c',type:String,multiple:true,description:"CSV files to load"},
+    {name:'queries',alias:'q',type:String,multiple:true,description:"Queries to run on the data"},
+    {name:'outfiles',alias:'o',type:String,multiple:true,description:"Paths were the data should be written to. One per query"},
+    {name:'csvdelimiter',alias:'d',defaultValue:";",type:String,description:"Delimiter of the csv files"},
+    {name:'outputdelimiter',alias:'D',defaultValue:';',type:String,description:"Delimiter of the output csv files"},
+    {name:'noheader',alias:'H',defaultValue:false,type:Boolean,description:"Omit writing the header to the csv files"},
+    {name:'csvencoding',alias:'e',defaultValue:"latin1",type:String,description:"Encoding of the loaded csv files"},
+    {name:'queryencoding',defaultValue:"latin1",type:String,description:"Encoding of the queries"},
+    {name:'help',alias:'h',defaultValue:false,type:Boolean,description:"Show this help text"}
 ];
+
 const options = commandLineArgs.default(optionsDefinitions);
+
+if(options.help){
+    const sections = [
+        {
+        header:"queryoncsv",
+        content: "A small command line utility to query csv files using sqlite3"
+        },{
+            header:"Options",
+            optionList:optionsDefinitions
+        }
+    ];
+    console.log(cmdusage(sections));
+    process.exit(0);
+}
+
 if(!options.csv || options.csv.length == 0){
     console.error("No csv files supplied, exiting");
     process.exit(1);
@@ -131,7 +147,7 @@ function executeQueries(paths:string[],callback:async.ErrorCallback<Error>){
                     separator:options.outputdelimiter,
                     newline:options.outputnewline,
                     header:header,
-                    sendHeaders:options.outputheader
+                    sendHeaders:!options.noheader
                 });
                 writer.pipe(fs.createWriteStream(outpath));
                 rows.forEach((row)=>{writer.write(row)});
