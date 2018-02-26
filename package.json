@@ -1,0 +1,29 @@
+{
+  "name": "queryoncsv",
+  "version": "1.0.0",
+  "description": "A small tool to execute sqlite3 queries on csv files",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saildeep/queryoncsv.git"
+  },
+  "keywords": [
+    "csv",
+    "data",
+    "query",
+    "sql",
+    "sqlite3"
+  ],
+  "author": "Jonas Körner",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/saildeep/queryoncsv/issues"
+  },
+  "homepage": "https://github.com/saildeep/queryoncsv#readme",
+  "dependencies": {
+    "typescript": "^2.7.2"
+  }
+}
