@@ -1,3 +1,5 @@
+const csvgenerate: any = require('csv-write-stream');
+
 import * as commandLineArgs from 'command-line-args';
 import * as fs from 'fs';
 import * as sqlite3 from "sqlite3";
@@ -10,7 +12,13 @@ const optionsDefinitions:commandLineArgs.OptionDefinition[]= [
     {name:'verbose',alias:'v',type:Boolean},
     {name:'csv',alias:'c',type:String,multiple:true},
     {name:'queries',alias:'q',type:String,multiple:true},
+    {name:'outfiles',alias:'o',type:String,multiple:true},
     {name:'csvdelimiter',alias:'d',defaultValue:";",type:String},
+    {name:'outputdelimiter',alias:'D',defaultValue:';',type:String},
+    {name:'outputnewline',alias:'N',defaultValue:'\n',type:String},
+    {name:'outputheader',alias:'H',defaultValue:true,type:String}
+    {name:'csvencoding',alias:'e',defaultValue:"latin1",type:String},
+    {name:'queryencoding',defaultValue:"latin1",type:String}
 ];
 const options = commandLineArgs.default(optionsDefinitions);
 if(!options.csv || options.csv.length == 0){
@@ -50,7 +58,7 @@ function loadCSVFiles(paths:string[],callback:async.ErrorCallback<Error>){
         const tablename = path.basename(csvpath,".csv");
         log("Success checking "  + tablename +"!");
         const abspath = path.resolve(csvpath);
-        const csvContent = fs.readFileSync(abspath,{encoding:'utf-8'});
+        const csvContent:string = fs.readFileSync(abspath).toString(options.csvencoding);
         csvparser.default(csvContent,{delimiter:options.csvdelimiter},function(err,parsedCSV:string[][]){
             if(err){
                 return callback(err);
@@ -101,10 +109,31 @@ function executeQueries(paths:string[],callback:async.ErrorCallback<Error>){
             process.exit(1);
         }
         log("Found " + querypath);
-        const query = fs.readFileSync(querypath,{encoding:"utf-8","flag":"r"});
+        const query = fs.readFileSync(querypath,{encoding:null,"flag":"r"}).toString(options.queryencoding);
         log(query);
-        db.each(query,(err,row)=>{
-            console.log(row);
+        db.all(query,(err,rows)=>{
+            log(rows);
+            if(rows.length == 0){
+                log("Empty query result");
+            }else{
+                //TODO change
+                const outpath = options.outfiles[0];
+                const header = Object.keys(rows[0]);
+
+                log(header);
+                const writer = csvgenerate({
+                    separator:options.outputdelimiter,
+                    newline:options.outputnewline,
+                    header:header,
+                    sendHeaders:options.outputheader
+                });
+                writer.pipe(fs.createWriteStream(outpath));
+                rows.forEach((row)=>{writer.write(row)});
+                writer.end();
+
+
+            }
+            
         })
     });
 }
