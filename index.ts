@@ -16,7 +16,7 @@ const optionsDefinitions:commandLineArgs.OptionDefinition[]= [
     {name:'csvdelimiter',alias:'d',defaultValue:";",type:String},
     {name:'outputdelimiter',alias:'D',defaultValue:';',type:String},
     {name:'outputnewline',alias:'N',defaultValue:'\n',type:String},
-    {name:'outputheader',alias:'H',defaultValue:true,type:String}
+    {name:'outputheader',alias:'H',defaultValue:true,type:String},
     {name:'csvencoding',alias:'e',defaultValue:"latin1",type:String},
     {name:'queryencoding',defaultValue:"latin1",type:String}
 ];
@@ -27,6 +27,11 @@ if(!options.csv || options.csv.length == 0){
 }
 if(!options.queries || options.queries.length == 0){
     console.error("No queries supplied, exiting");
+    process.exit(1);
+}
+
+if(!options.outfiles || options.outfiles.length != options.queries.length){
+    console.error("Number of outfiles need to match number of queries");
 }
 
 loadCSVFiles(options.csv,function(err){
@@ -103,7 +108,7 @@ function loadCSVFiles(paths:string[],callback:async.ErrorCallback<Error>){
 }
 
 function executeQueries(paths:string[],callback:async.ErrorCallback<Error>){
-    async.each(paths,(querypath:string,callback:async.ErrorCallback<Error>)=>{
+    async.eachOf(paths,(querypath:string,queryindex,callback:async.ErrorCallback<Error>)=>{
         if(!fs.lstatSync(querypath).isFile()){
             console.error("Could not find " + querypath+ " ,exiting");
             process.exit(1);
@@ -116,8 +121,8 @@ function executeQueries(paths:string[],callback:async.ErrorCallback<Error>){
             if(rows.length == 0){
                 log("Empty query result");
             }else{
-                //TODO change
-                const outpath = options.outfiles[0];
+               
+                const outpath = options.outfiles[queryindex];
                 const header = Object.keys(rows[0]);
 
                 log(header);
