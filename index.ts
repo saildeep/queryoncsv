@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const csvgenerate: any = require('csv-write-stream');
 
 import * as commandLineArgs from 'command-line-args';
