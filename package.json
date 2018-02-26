@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/saildeep/queryoncsv#readme",
   "dependencies": {
+    "sqlite3": "^3.1.13",
     "typescript": "^2.7.2"
   }
 }
