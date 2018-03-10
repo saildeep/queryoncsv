@@ -16,7 +16,7 @@ const optionsDefinitions:commandLineArgs.OptionDefinition[]= [
     {name:'outfiles',alias:'o',type:String,multiple:true,description:"Paths were the data should be written to. One per query"},
     {name:'csvdelimiter',alias:'d',defaultValue:";",type:String,description:"Delimiter of the csv files"},
     {name:'outputdelimiter',alias:'D',defaultValue:';',type:String,description:"Delimiter of the output csv files"},
-    {name:'outputnewline',alias:'N',defaultValue:'\n',type:String,description:"Newline of the output csv files"},
+    {name:'outputnewline',alias:'N',defaultValue:'\r\n',type:String,description:"Newline of the output csv files"},
     {name:'noheader',alias:'H',defaultValue:false,type:Boolean,description:"Omit writing the header to the csv files"},
     {name:'csvencoding',alias:'e',defaultValue:"utf-8",type:String,description:"Encoding of the loaded csv files"},
     {name:'queryencoding',defaultValue:"utf-8",type:String,description:"Encoding of the queries"},
