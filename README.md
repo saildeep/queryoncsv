@@ -20,7 +20,8 @@ Options
   -o, --outfiles string[]        Paths were the data should be written to. One per query
   -d, --csvdelimiter string      Delimiter of the csv files
   -D, --outputdelimiter string   Delimiter of the output csv files
-  -H, --outputheader             Omit writing the header to the csv files
+  -N, --outputnewline string     Newline of the output csv files
+  -H, --noheader                 Omit writing the header to the csv files
   -e, --csvencoding string       Encoding of the loaded csv files
   --queryencoding string         Encoding of the queries
   -h, --help                     Show this help text
