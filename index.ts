@@ -89,7 +89,18 @@ function loadCSVFiles(paths:string[],callback:async.ErrorCallback<Error>){
             
             log(parsedCSV[0]);
             const columnNames = parsedCSV[0];
-            const columnDefinitions =columnNames.map(column => {return column + " TEXT";}).reduce((a,b)=>{return a+ ", " +b;});
+            const columnUsages :{[key:string]:number} ={};
+            const columnDefinitions =columnNames.map(function(column){
+                
+                let lastUsage:number = 0;
+                let columnStr:String = column;
+                if(column in columnUsages){
+                    lastUsage = columnUsages[column]
+                    columnStr = column + "-duplicate-" + lastUsage;
+                }
+                columnUsages[column] = lastUsage + 1;
+                return "[" + columnStr + "]" + " TEXT";
+            }).reduce((a,b)=>{return a+ ", " +b;});
             
             const tableDefinition = "CREATE TABLE " + tablename + " (" + columnDefinitions + ")";
             log(tableDefinition);
