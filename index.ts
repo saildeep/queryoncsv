@@ -146,6 +146,11 @@ function executeQueries(paths:string[],callback:async.ErrorCallback<Error>){
         const query = fs.readFileSync(querypath,{encoding:null,"flag":"r"}).toString(options.queryencoding);
         log(query);
         db.all(query,(err,rows)=>{
+            if(err){
+                console.error(err);
+                return;
+            }
+
             log(rows);
             if(rows.length == 0){
                 log("Empty query result");
