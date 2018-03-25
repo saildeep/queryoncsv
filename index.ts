@@ -19,6 +19,8 @@ const optionsDefinitions:commandLineArgs.OptionDefinition[]= [
     {name:'outputnewline',alias:'N',defaultValue:'\r\n',type:String,description:"Newline of the output csv files"},
     {name:'noheader',alias:'H',defaultValue:false,type:Boolean,description:"Omit writing the header to the csv files"},
     {name:'csvencoding',alias:'e',defaultValue:"utf-8",type:String,description:"Encoding of the loaded csv files"},
+    {name:'outputencoding',alias:'E',defaultValue:"utf-8",type:String,description:"Encoding of the output csv files"},
+    
     {name:'queryencoding',defaultValue:"utf-8",type:String,description:"Encoding of the queries"},
     {name:'help',alias:'h',defaultValue:false,type:Boolean,description:"Show this help text"}
 ];
@@ -50,6 +52,7 @@ if(!options.queries || options.queries.length == 0){
 
 if(!options.outfiles || options.outfiles.length != options.queries.length){
     console.error("Number of outfiles need to match number of queries");
+    process.exit(1);
 }
 
 loadCSVFiles(options.csv,function(err){
@@ -115,6 +118,7 @@ function loadCSVFiles(paths:string[],callback:async.ErrorCallback<Error>){
                         return callback();
                     const queryString = "INSERT INTO " + tablename + " VALUES (" + row.map(_=>{return "?"}).reduce((a,b)=>{return a+ ", " +b;}) + ")";
                     log(queryString);
+                    log(row);
                     db.run(queryString,row,(err:Error|undefined)=>{
                         callback(err);
                     })
@@ -166,7 +170,7 @@ function executeQueries(paths:string[],callback:async.ErrorCallback<Error>){
                     header:header,
                     sendHeaders:!options.noheader
                 });
-                writer.pipe(fs.createWriteStream(outpath));
+                writer.pipe(fs.createWriteStream(outpath,{encoding:options.outputencoding}));
                 rows.forEach((row)=>{writer.write(row)});
                 writer.end();
 

@@ -1,9 +1,10 @@
 {
   "name": "queryoncsv",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A small tool to execute sqlite3 queries on csv files",
   "main": "dist/index.js",
   "scripts": {
+    "live-compile":"./node_modules/.bin/tsc -w",
     "postinstall": "tsc",
     "start": "node dist/index.js"
   },
