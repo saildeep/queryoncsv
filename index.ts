@@ -7,6 +7,7 @@ import * as sqlite3 from "sqlite3";
 import * as async from "async";
 import * as path from "path";
 import * as csvparser from "csv-parse";
+import * as iconvlite from "iconv-lite";
 const db = new sqlite3.Database(':memory:');
 
 const optionsDefinitions:commandLineArgs.OptionDefinition[]= [
@@ -55,6 +56,21 @@ if(!options.outfiles || options.outfiles.length != options.queries.length){
     process.exit(1);
 }
 
+if(!iconvlite.encodingExists(options.csvencoding)){
+    console.error("CSV Encoding " + options.csvencoding + " does not exist");
+    process.exit(1);
+}
+
+if(!iconvlite.encodingExists(options.queryencoding)){
+    console.error("Query Encoding " + options.queryencoding + " does not exist");
+    process.exit(1);
+}
+
+if(!iconvlite.encodingExists(options.outputencoding)){
+    console.error("Output Encoding " + options.outputencoding + " does not exist");
+    process.exit(1);
+}
+
 loadCSVFiles(options.csv,function(err){
     if(err){
         console.error(err);
@@ -62,7 +78,9 @@ loadCSVFiles(options.csv,function(err){
     }
     log("Succesfully loaded all csv files");
     executeQueries(options.queries,function(err){
-
+        if(err){
+            console.error(err);
+        }
     });
 
 });
@@ -84,7 +102,8 @@ function loadCSVFiles(paths:string[],callback:async.ErrorCallback<Error>){
         const tablename = path.basename(csvpath,".csv");
         log("Success checking "  + tablename +"!");
         const abspath = path.resolve(csvpath);
-        const csvContent:string = fs.readFileSync(abspath).toString(options.csvencoding);
+        const csvContentBuffer:Buffer = fs.readFileSync(abspath);
+        const csvContent:string = iconvlite.decode(csvContentBuffer, options.csvencoding);
         csvparser.default(csvContent,{delimiter:options.csvdelimiter},function(err,parsedCSV:string[][]){
             if(err){
                 return callback(err);
@@ -147,7 +166,8 @@ function executeQueries(paths:string[],callback:async.ErrorCallback<Error>){
             process.exit(1);
         }
         log("Found " + querypath);
-        const query = fs.readFileSync(querypath,{encoding:null,"flag":"r"}).toString(options.queryencoding);
+        const queryBuffer:Buffer = fs.readFileSync(querypath,{encoding:null,"flag":"r"});
+        const query:string = iconvlite.decode(queryBuffer,options.queryencoding);
         log(query);
         db.all(query,(err,rows)=>{
             if(err){
@@ -170,7 +190,12 @@ function executeQueries(paths:string[],callback:async.ErrorCallback<Error>){
                     header:header,
                     sendHeaders:!options.noheader
                 });
-                writer.pipe(fs.createWriteStream(outpath,{encoding:options.outputencoding}));
+                
+                
+                writer
+                .pipe(iconvlite.encodeStream(options.outputencoding))    
+                .pipe(fs.createWriteStream(outpath));
+                
                 rows.forEach((row)=>{writer.write(row)});
                 writer.end();
 
